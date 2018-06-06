@@ -64,13 +64,13 @@ public class LoginActivity extends Activity {
         params.putString("usuarioSenha", usuario.getSenha());
     }
 
-    /* Método para ir a tela Calendário */
-    private void carregarCalendarioActivity(Context context) {
+    /* Carregar TreinoActivity */
+    private void carregarTreinoActivity(Context context) {
         carregarParams();
         /* iniciando nova tela*/
-        //Intent iLogin = new Intent(this, CalendarioActivity.class);
-        //iLogin.putExtras(params);
-        //startActivity(iLogin);
+        Intent iLogin = new Intent(this, TreinoActivity.class);
+        iLogin.putExtras(params);
+        startActivity(iLogin);
     }
 
     private void realizarLogin (Context context, String login, String senha) {
@@ -79,7 +79,7 @@ public class LoginActivity extends Activity {
             Toast.makeText(context, "id " + usuario.getId() + "!", Toast.LENGTH_LONG).show();
             if (usuario.getId() != -1L) {
                 Toast.makeText(context, "Bem Vindo " + usuario.getNome() + "!", Toast.LENGTH_LONG).show();
-                carregarCalendarioActivity(this);
+                carregarTreinoActivity(this);
             } else {
                 Toast.makeText(context, "Usuário ou Senha incorretos", Toast.LENGTH_LONG).show();
             }
