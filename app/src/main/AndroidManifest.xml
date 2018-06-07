@@ -16,6 +16,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".UsuarioAdicionarActivity"></activity>
+        <activity android:name=".TreinoActivity"></activity>
 
     </application>
 

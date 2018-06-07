@@ -47,7 +47,11 @@ public class TreinoActivity extends Activity {
             public void onSelectedDayChange(@NonNull final CalendarView view, int year, int month, int dayOfMonth) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(TreinoActivity.this);
                 CharSequence[]itens = new  CharSequence[3];
-                itens[0]="Novo Exercício";
+                if (usuario.getCategoria().getId() == 0L) {
+                    itens[0]="Novo Exercício";
+                } else {
+                    itens[0]="Validar Exercício";
+                }
                 itens[1]="Consulta Treino";
                 itens[2]="Cancelar";
 
@@ -59,7 +63,7 @@ public class TreinoActivity extends Activity {
                         // usa um switch fica melhor o código
                         switch (which) {
                             case 0:
-                                ir_addActivity(TreinoActivity.this);
+                                carregarTreinoAdicionarAcivity(TreinoActivity.this);
                                 break;
                             case 1:
                                 visualizarTreino(view);
@@ -83,9 +87,9 @@ public class TreinoActivity extends Activity {
     /* Visualizar Treino */
     public void visualizarTreino(View view){
         ListView lista = (ListView) findViewById(R.id.ltvListaTreino);
-        /*ArrayAdapter<Treino> arrayAd = new ArrayAdapter<Treino>(getApplicationContext(),
-                android.R.layout.simple_list_item_1, base.consultarTreino());
-        lista.setAdapter(arrayAd);*/
+        ArrayAdapter<Treino> arrayAd = new ArrayAdapter<Treino>(getApplicationContext(),
+                android.R.layout.simple_list_item_1, base.consultarTreino(data, usuario));
+        lista.setAdapter(arrayAd);
     }
 
     /* Recuperar params */
@@ -112,7 +116,7 @@ public class TreinoActivity extends Activity {
         params.putLong("treinoData", data);
     }
 
-    private void ir_addActivity (Context context) {
+    private void carregarTreinoAdicionarAcivity (Context context) {
         carregarParams();
         /* iniciando nova tela*/
         /*Intent iAddActivity = new Intent(this, AddActivity.class);

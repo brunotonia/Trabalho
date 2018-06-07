@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Switch;
+
+import java.util.ArrayList;
 
 public class DataBaseHelper extends SQLiteOpenHelper {
     public static final int DATABASE_VERSION = 1;
@@ -101,5 +104,85 @@ public class DataBaseHelper extends SQLiteOpenHelper {
                     cursor.getColumnIndex(UsuarioCategoriaConstantes.COLUMN_CATEGORIA)));;
         }
         return categoria;
+    }
+
+    public Usuario buscarUsuario (Long id) {
+        /* Variáveis do BD */
+        SQLiteDatabase db = this.getWritableDatabase();
+        Usuario usuario = new Usuario(-1L, new UsuarioCategoria(-1L, "erro"),
+                "erro", "erro", "senha");
+        String colunas[] = {UsuarioConstantes.COLUMN_ID, UsuarioConstantes.COLUMN_CATEGORIA,
+                UsuarioConstantes.COLUMN_NOME, UsuarioConstantes.COLUMN_LOGIN,
+                UsuarioConstantes.COLUMN_SENHA};
+        String selecao = UsuarioConstantes.COLUMN_ID + " =? ";
+        String valores[] = {id.toString()};
+
+        /* Realizando busca no banco de dados */
+        Cursor cursor =  db.query(UsuarioConstantes.TABLE_NOME, colunas, selecao, valores,
+                null, null, null, null);
+        if (cursor.moveToFirst()) {
+            usuario.setId(cursor.getLong(cursor.getColumnIndex(UsuarioConstantes.COLUMN_ID)));
+            usuario.setCategoria(buscarUsuarioCategoria(cursor.getLong(cursor.getColumnIndex(UsuarioConstantes.COLUMN_CATEGORIA))));
+            usuario.setNome(cursor.getString(cursor.getColumnIndex(UsuarioConstantes.COLUMN_NOME)));
+            usuario.setLogin(cursor.getString(cursor.getColumnIndex(UsuarioConstantes.COLUMN_LOGIN)));
+            usuario.setSenha(cursor.getString(cursor.getColumnIndex(UsuarioConstantes.COLUMN_SENHA)));
+        }
+        return usuario;
+    }
+
+    public TreinoCategoria buscarTreinoCategoria (Long id) {
+        /* Variáveis do BD */
+        SQLiteDatabase db = this.getWritableDatabase();
+        TreinoCategoria categoria = new TreinoCategoria(-1L, "erro");
+
+        String colunas[] = {UsuarioCategoriaConstantes.COLUMN_ID, UsuarioCategoriaConstantes.COLUMN_CATEGORIA};
+        String selecao = UsuarioCategoriaConstantes.COLUMN_ID + " =? ";
+        String valores[] = {id.toString()};
+
+        /* Realizando busca no banco de dados */
+        Cursor cursor =  db.query(TreinoCategoriaConstantes.TABLE_NOME, colunas, selecao, valores,
+                null, null, null, null);
+        if (cursor.moveToFirst()) {
+            categoria.setId(cursor.getLong(cursor.getColumnIndex(TreinoCategoriaConstantes.COLUMN_ID)));
+            categoria.setCategoria(cursor.getString(
+                    cursor.getColumnIndex(TreinoCategoriaConstantes.COLUMN_CATEGORIA)));;
+        }
+        return categoria;
+    }
+
+    public ArrayList consultarTreino(Long data, Usuario usuario){
+        ArrayList lista = new ArrayList();
+        SQLiteDatabase db = this.getReadableDatabase();
+        String colunas[] = {TreinoConstantes.COLUMN_ID, TreinoConstantes.COLUMN_PROFESSOR,
+                TreinoConstantes.COLUMN_ALUNO, TreinoConstantes.COLUMN_CATEGORIA, TreinoConstantes.COLUMN_DATA,
+                TreinoConstantes.COLUMN_EXERCICIO, TreinoConstantes.COLUMN_REPETICAO,
+                TreinoConstantes.COLUMN_CARGA, TreinoConstantes.COLUMN_INTERVALO,
+                TreinoConstantes.COLUMN_REALIZADO};
+        String selecao;
+        if (usuario.getCategoria().getId() == 0L) {
+            selecao = TreinoConstantes.COLUMN_DATA + " =? AND " +
+                    TreinoConstantes.COLUMN_PROFESSOR + " =? ";
+        } else {
+                selecao = TreinoConstantes.COLUMN_DATA + " =? AND " +
+                        TreinoConstantes.COLUMN_ALUNO + " =? ";
+        }
+        String valores[] = {data.toString(), usuario.getId().toString()};
+
+        /* Realizando busca no banco de dados */
+        Cursor cursor =  db.query(TreinoConstantes.TABLE_NOME, colunas, selecao, valores,
+                null, null, null, null);
+        while (cursor.moveToNext()){
+            lista.add(new Treino(cursor.getLong(cursor.getColumnIndex(TreinoConstantes.COLUMN_ID)),
+                    buscarUsuario(cursor.getLong(cursor.getColumnIndex(TreinoConstantes.COLUMN_PROFESSOR))),
+                    buscarUsuario(cursor.getLong(cursor.getColumnIndex(TreinoConstantes.COLUMN_ALUNO))),
+                    buscarTreinoCategoria(cursor.getLong(cursor.getColumnIndex(TreinoConstantes.COLUMN_CATEGORIA))),
+                    cursor.getLong(cursor.getColumnIndex(TreinoConstantes.COLUMN_DATA)),
+                    cursor.getString(cursor.getColumnIndex(TreinoConstantes.COLUMN_EXERCICIO)),
+                    cursor.getInt(cursor.getColumnIndex(TreinoConstantes.COLUMN_REPETICAO)),
+                    cursor.getInt(cursor.getColumnIndex(TreinoConstantes.COLUMN_CARGA)),
+                    cursor.getInt(cursor.getColumnIndex(TreinoConstantes.COLUMN_INTERVALO)),
+                    (cursor.getInt(cursor.getColumnIndex(TreinoConstantes.COLUMN_REALIZADO)) == 0L)));
+        }
+        return  lista;
     }
 }
